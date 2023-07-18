@@ -28,27 +28,34 @@ class FF_MNIST(torch.utils.data.Dataset):
         return len(self.mnist)
 
     def _get_pos_sample(self, sample, class_label):
-        one_hot_label = torch.nn.functional.one_hot(
-            torch.tensor(class_label), num_classes=self.num_classes
-        )
-        pos_sample = sample.clone()
-        pos_sample[:, 0, : self.num_classes] = one_hot_label
+        if self.opt.data.encode_label:
+            one_hot_label = torch.nn.functional.one_hot(
+                torch.tensor(class_label), num_classes=self.num_classes
+            )
+            pos_sample = sample.clone()
+            pos_sample[:, 0, : self.num_classes] = one_hot_label
+        else:
+            pos_sample = sample
         return pos_sample
 
     def _get_neg_sample(self, sample, class_label):
-        # Create randomly sampled one-hot label.
-        classes = list(range(self.num_classes))
-        classes.remove(class_label)  # Remove true label from possible choices.
-        wrong_class_label = np.random.choice(classes)
-        one_hot_label = torch.nn.functional.one_hot(
-            torch.tensor(wrong_class_label), num_classes=self.num_classes
-        )
-        neg_sample = sample.clone()
-        neg_sample[:, 0, : self.num_classes] = one_hot_label
+        if self.opt.data.encode_label:
+            # Create randomly sampled one-hot label.
+            classes = list(range(self.num_classes))
+            classes.remove(class_label)  # Remove true label from possible choices.
+            wrong_class_label = np.random.choice(classes)
+            one_hot_label = torch.nn.functional.one_hot(
+                torch.tensor(wrong_class_label), num_classes=self.num_classes
+            )
+            neg_sample = sample.clone()
+            neg_sample[:, 0, : self.num_classes] = one_hot_label
+        else:
+            neg_sample = torch.rand_like(sample)
         return neg_sample
 
     def _get_neutral_sample(self, z):
-        z[:, 0, : self.num_classes] = self.uniform_label
+        if self.opt.data.encode_label:
+            z[:, 0, :self.num_classes] = self.uniform_label
         return z
 
     def _generate_sample(self, index):

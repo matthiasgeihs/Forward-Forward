@@ -29,6 +29,8 @@ training:
   val_idx: -1  # -1: validate only once training has finished; n: validate every n epochs.
   final_test: False  # Set to true to evaluate performance on test-set.
 
+data:
+  encode_label: False  # Set to true to encode labels as one-hot vectors.
 
 hydra:
   run:
