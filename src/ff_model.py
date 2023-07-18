@@ -110,7 +110,7 @@ class FF_model(torch.nn.Module):
             scalar_outputs[f"loss_layer_{idx}"] = ff_loss
             scalar_outputs[f"ff_accuracy_layer_{idx}"] = ff_accuracy
             scalar_outputs["Loss"] += ff_loss
-            z = z.detach()
+            z = z.detach() # Detach z to prevent gradients from flowing back to the previous layer.
 
             z = self._layer_norm(z)
 
