@@ -1,5 +1,5 @@
 seed: 42
-device: "cuda"  # cpu or cuda
+device: "cpu"  # cpu or cuda
 
 input:
   path: datasets
@@ -7,7 +7,8 @@ input:
 
 
 model:
-  peer_normalization: 0.03
+  # peer_normalization: 0.03
+  peer_normalization: 0 # Setting this to 0 doesn't seem to affect the final performance by much.
   momentum: 0.9  # Momentum to use for the running mean in peer normalization loss.
 
   hidden_dim: 1000
@@ -15,7 +16,8 @@ model:
 
 
 training:
-  epochs: 100
+  # epochs: 100
+  epochs: 10 # Reducing the number of epochs does not affect the final performance much.
 
   learning_rate: 1e-3
   weight_decay: 3e-4
