@@ -84,6 +84,10 @@ def get_MNIST_partition(opt, partition):
             download=True,
             transform=torchvision.transforms.ToTensor(),
         )
+        if partition == "train":
+            mnist = torch.utils.data.Subset(mnist, range(50000))
+        elif partition == "val":
+            mnist = torch.utils.data.Subset(mnist, range(50000, 60000))
     elif partition in ["test"]:
         mnist = torchvision.datasets.MNIST(
             os.path.join(get_original_cwd(), opt.input.path),
@@ -93,17 +97,6 @@ def get_MNIST_partition(opt, partition):
         )
     else:
         raise NotImplementedError
-
-    if partition == "train":
-        mnist = torch.utils.data.Subset(mnist, range(50000))
-    elif partition == "val":
-        mnist = torchvision.datasets.MNIST(
-            os.path.join(get_original_cwd(), opt.input.path),
-            train=True,
-            download=True,
-            transform=torchvision.transforms.ToTensor(),
-        )
-        mnist = torch.utils.data.Subset(mnist, range(50000, 60000))
 
     return mnist
 
