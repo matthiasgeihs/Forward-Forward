@@ -22,8 +22,7 @@ def parse_args(opt):
 
 def get_model_and_optimizer(opt):
     model = ff_model.FF_model(opt)
-    if "cuda" in opt.device:
-        model = model.cuda()
+    model = model.to(opt.device)
     print(model, "\n")
 
     # Create optimizer with different hyper-parameters for the main model
@@ -109,16 +108,15 @@ def get_MNIST_partition(opt, partition):
     return mnist
 
 
-def dict_to_cuda(dict):
+def dict_to_device(dict, device):
     for key, value in dict.items():
-        dict[key] = value.cuda(non_blocking=True)
+        dict[key] = value.to(device, non_blocking=True)
     return dict
 
 
 def preprocess_inputs(opt, inputs, labels):
-    if "cuda" in opt.device:
-        inputs = dict_to_cuda(inputs)
-        labels = dict_to_cuda(labels)
+    inputs = dict_to_device(inputs, opt.device)
+    labels = dict_to_device(labels, opt.device)
     return inputs, labels
 
 
