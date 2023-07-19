@@ -8,3 +8,4 @@ conda activate FF
 conda install pytorch=1.11 torchvision torchaudio cudatoolkit=11.3 -c pytorch
 pip install hydra-core
 pip install einops
+pip install tqdm

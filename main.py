@@ -4,6 +4,7 @@ from collections import defaultdict
 import hydra
 import torch
 from omegaconf import DictConfig
+from tqdm import tqdm
 
 from src import utils
 
@@ -17,7 +18,8 @@ def train(opt, model, optimizer):
         train_results = defaultdict(float)
         optimizer = utils.update_learning_rate(optimizer, opt, epoch)
 
-        for inputs, labels in train_loader:
+        print(f"Epoch: {epoch}")
+        for inputs, labels in tqdm(train_loader):
             inputs, labels = utils.preprocess_inputs(opt, inputs, labels)
 
             optimizer.zero_grad()
