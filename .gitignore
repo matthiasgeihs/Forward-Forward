@@ -132,3 +132,9 @@ dmypy.json
 .DS_Store
 */.DS_Store
 .idea
+
+# Training datasets
+datasets/
+
+# Logs
+logs/
