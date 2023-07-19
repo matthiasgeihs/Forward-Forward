@@ -159,6 +159,6 @@ def log_results(result_dict, scalar_outputs, num_steps):
     for key, value in scalar_outputs.items():
         if isinstance(value, float):
             result_dict[key] += value / num_steps
-        else:
+        elif value.numel() == 1:
             result_dict[key] += value.item() / num_steps
     return result_dict

@@ -39,6 +39,7 @@ class FF_Shakespeare(torch.utils.data.Dataset):
         self.text = get_shakespeare_partition(opt, partition)
         self.tokens = sorted(set(self.text))
         self.stoi = {c: i for i, c in enumerate(self.tokens)}
+        self.itos = {i: c for i, c in enumerate(self.tokens)}
         self.num_classes = len(self.tokens)
 
     def __getitem__(self, index):

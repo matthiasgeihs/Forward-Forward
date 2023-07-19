@@ -7,9 +7,10 @@ from omegaconf import DictConfig
 from tqdm import tqdm
 
 from src import utils
+from src.ff_model import FF_model
 
 
-def train(opt, model, optimizer):
+def train(opt, model: FF_model, optimizer):
     start_time = time.time()
     train_loader = utils.get_data(opt, "train")
     num_steps_per_epoch = len(train_loader)
@@ -39,6 +40,13 @@ def train(opt, model, optimizer):
         # Validate.
         if epoch % opt.training.val_idx == 0 and opt.training.val_idx != -1:
             validate_or_test(opt, model, "val", epoch=epoch)
+            
+        # Generate.
+        context = """First Citizen:
+Before we proceed any further, hear me speak. No """
+        tokens = torch.Tensor([train_loader.dataset.stoi[x] for x in context]).unsqueeze(0).to(opt.device)
+        generated = model.generate(tokens)
+        print("".join([train_loader.dataset.itos[x.item()] for x in generated[0]]))
 
     return model
 
