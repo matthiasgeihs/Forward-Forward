@@ -8,7 +8,7 @@ import torchvision
 from hydra.utils import get_original_cwd
 from omegaconf import OmegaConf
 
-from src import ff_mnist, ff_model
+from src import ff_mnist, ff_model, ff_shakespeare
 
 
 def parse_args(opt):
@@ -52,7 +52,10 @@ def get_model_and_optimizer(opt):
 
 
 def get_data(opt, partition):
-    dataset = ff_mnist.FF_MNIST(opt, partition)
+    if opt.input.dataset == "shakespeare":
+        dataset = ff_shakespeare.FF_Shakespeare(opt, partition)
+    else:
+        dataset = ff_mnist.FF_MNIST(opt, partition)
 
     # Improve reproducibility in dataloader.
     g = torch.Generator()

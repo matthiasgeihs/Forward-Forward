@@ -16,8 +16,15 @@ class FF_model(torch.nn.Module):
         self.num_channels = [self.opt.model.hidden_dim] * self.opt.model.num_layers
         self.act_fn = ReLU_full_grad()
 
+        if opt.input.dataset == "shakespeare":
+            input_dim = opt.input.shakespeare.sample_len
+            output_dim = opt.input.shakespeare.num_classes
+        else:
+            input_dim = 784
+            output_dim = 10
+        
         # Initialize the model.
-        self.model = nn.ModuleList([nn.Linear(784, self.num_channels[0])])
+        self.model = nn.ModuleList([nn.Linear(input_dim, self.num_channels[0])])
         for i in range(1, len(self.num_channels)):
             self.model.append(nn.Linear(self.num_channels[i - 1], self.num_channels[i]))
 
@@ -35,7 +42,7 @@ class FF_model(torch.nn.Module):
             self.num_channels[-i] for i in range(self.opt.model.num_layers - 1)
         )
         self.linear_classifier = nn.Sequential(
-            nn.Linear(channels_for_classification_loss, 10, bias=False)
+            nn.Linear(channels_for_classification_loss, output_dim, bias=False)
         )
         self.classification_loss = nn.CrossEntropyLoss()
 
@@ -90,7 +97,7 @@ class FF_model(torch.nn.Module):
         }
 
         # Concatenate positive and negative samples and create corresponding labels.
-        z = torch.cat([inputs["pos_images"], inputs["neg_images"]], dim=0)
+        z = torch.cat([inputs["pos"], inputs["neg"]], dim=0)
         posneg_labels = torch.zeros(z.shape[0], device=self.opt.device)
         posneg_labels[: self.opt.input.batch_size] = 1
 
@@ -128,7 +135,7 @@ class FF_model(torch.nn.Module):
                 "Loss": torch.zeros(1, device=self.opt.device),
             }
 
-        z = inputs["neutral_sample"]
+        z = inputs["neutral"]
         z = z.reshape(z.shape[0], -1)
         z = self._layer_norm(z)
 
@@ -147,9 +154,9 @@ class FF_model(torch.nn.Module):
 
         output = self.linear_classifier(input_classification_model.detach())
         output = output - torch.max(output, dim=-1, keepdim=True)[0]
-        classification_loss = self.classification_loss(output, labels["class_labels"])
+        classification_loss = self.classification_loss(output, labels["label"])
         classification_accuracy = utils.get_accuracy(
-            self.opt, output.data, labels["class_labels"]
+            self.opt, output.data, labels["label"]
         )
 
         scalar_outputs["Loss"] += classification_loss

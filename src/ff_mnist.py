@@ -17,18 +17,18 @@ class FF_MNIST(torch.utils.data.Dataset):
         )
 
         inputs = {
-            "pos_images": pos_sample,
-            "neg_images": neg_sample,
-            "neutral_sample": neutral_sample,
+            "pos": pos_sample,
+            "neg": neg_sample,
+            "neutral": neutral_sample,
         }
-        labels = {"class_labels": class_label}
+        labels = {"label": class_label}
         return inputs, labels
 
     def __len__(self):
         return len(self.mnist)
 
     def _get_pos_sample(self, sample, class_label):
-        if self.opt.data.encode_label:
+        if self.opt.input.mnist.encode_label:
             one_hot_label = torch.nn.functional.one_hot(
                 torch.tensor(class_label), num_classes=self.num_classes
             )
@@ -39,7 +39,7 @@ class FF_MNIST(torch.utils.data.Dataset):
         return pos_sample
 
     def _get_neg_sample(self, sample, class_label):
-        if self.opt.data.encode_label:
+        if self.opt.input.mnist.encode_label:
             # Create randomly sampled one-hot label.
             classes = list(range(self.num_classes))
             classes.remove(class_label)  # Remove true label from possible choices.
@@ -54,7 +54,7 @@ class FF_MNIST(torch.utils.data.Dataset):
         return neg_sample
 
     def _get_neutral_sample(self, z):
-        if self.opt.data.encode_label:
+        if self.opt.input.mnist.encode_label:
             z[:, 0, :self.num_classes] = self.uniform_label
         return z
 
